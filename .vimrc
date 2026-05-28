@@ -149,6 +149,7 @@ Plug 'https://github.com/easymotion/vim-easymotion.git'
 
 Plug 'preservim/nerdtree'
 
+Plug 'liuchengxu/vista.vim'
 " Plug 'mileszs/ack.vim'
 
 Plug 'flazz/vim-colorschemes'
@@ -169,6 +170,12 @@ Plug 'mattn/emmet-vim'
 
 Plug 'alvan/vim-closetag'
 
+Plug 'tpope/vim-surround'
+
+Plug 'sheerun/vim-polyglot'
+
+Plug 'preservim/vim-markdown'
+
 " Initialize plugin system
 call plug#end()
 
@@ -177,6 +184,29 @@ execute "set <M-B>=\eB"
 "execute "set <M-e>=\ee"
 let g:AutoPairsFlyMode = 1
 let g:AutoPairsShortcutBackInsert = '<M-B>'
+
+"fzf
+function! RgVisualSelection()
+    " 保存当前寄存器和光标位置
+    let l:save_reg = @"
+    let l:save_cursor = getpos(".")
+
+    " 获取可视区域文本
+    normal! gv"xy
+    let l:selection = @x
+
+    " 恢复寄存器和光标位置
+    let @" = l:save_reg
+    call setpos('.', l:save_cursor)
+
+    " 执行 :Rg 命令
+    execute 'Rg' l:selection
+endfunction
+
+
+nnoremap <silent> <C-p> :Files<CR>
+nnoremap <silent> <Leader>f :Rg<CR>
+vnoremap <silent> <Leader>f :<C-u>call RgVisualSelection()<CR>
 
 
 "easy-motion
@@ -189,10 +219,6 @@ nmap gf <Plug>(easymotion-overwin-f2)
 
 "CtrlP
 "CtrlPlet g:ctrlp_cmd = 'ff'
-
-"fzf
-nnoremap <silent> <C-p> :Files<CR>
-nnoremap <silent> <Leader>f :Rg<CR>
 
 "color theam
 colorscheme candy
@@ -226,8 +252,6 @@ let g:closetag_xhtml_filetypes = 'xhtml,jsx'
 let g:closetag_emptyTags_caseSensitive = 1
 let g:closetag_regions = {
 \ 'typescript.tsx': 'jsxRegion,tsxRegion',
-\ 'javascript.jsx': 'jsxRegion',
-\ 'typescriptreact': 'jsxRegion,tsxRegion',
 \ 'javascriptreact': 'jsxRegion',
 \ }
 let g:closetag_shortcut = '>'
@@ -241,7 +265,9 @@ let g:ycm_semantic_triggers = {
 		\ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
 		\ 'cs,lua,javascript,html': ['re!\w{2}'],
 		\ }
-let g:ycm_confirm_extra_conf=0
+"let g:ycm_confirm_extra_conf=0
+"
+let g:ycm_global_ycm_extra_conf = '~/.vim/plugged/YouCompleteMe/.ycm_extra_conf.py'
 set completeopt=longest,menu
 let g:ycm_seed_indentifiers_with_synatx=1
 autocmd InsertLeave * if pumvisible() == 0|pclose|endif
@@ -255,7 +281,7 @@ autocmd FileType xml,html inoremap </ </<C-x><C-o>
 let g:ale_sign_error = 'x'
 let g:ale_sign_warning = '!'
 let g:ale_set_highlights = 0
-" let g:ale_lint_on_enter = 0
+let g:ale_lint_on_enter = 0
 let g:ale_echo_msg_error_str = 'E'
 let g:ale_echo_msg_warning_str = 'W'
 let g:ale_echo_msg_format = '[%linter%] [%severity%] %s'
@@ -269,3 +295,39 @@ let g:ale_linters = {
 			\ 'c': ['clang'],
 			\ 'python': ['pylint'],
 			\ }
+
+" polyglot
+let g:polyglot_disabled = ['markdown']
+
+
+""""""""""""""""""""""""""""""""""""""" vim-markdown
+" Enable folding.
+let g:vim_markdown_folding_disabled = 0
+
+" Fold heading in with the contents.
+let g:vim_markdown_folding_style_pythonic = 1
+
+" Don't use the shipped key bindings.
+let g:vim_markdown_no_default_key_mappings = 1
+
+" Autoshrink TOCs.
+let g:vim_markdown_toc_autofit = 1
+
+" Indentation for new lists. We don't insert bullets as it doesn't play
+" nicely with `gq` formatting. It relies on a hack of treating bullets
+" as comment characters.
+" See https://github.com/plasticboy/vim-markdown/issues/232
+let g:vim_markdown_new_list_item_indent = 0
+let g:vim_markdown_auto_insert_bullets = 0
+
+" Filetype names and aliases for fenced code blocks.
+let g:vim_markdown_fenced_languages = ['php', 'py=python', 'js=javascript', 'bash=sh', 'viml=vim']
+
+" Highlight front matter (useful for Hugo posts).
+let g:vim_markdown_toml_frontmatter = 1
+let g:vim_markdown_json_frontmatter = 1
+let g:vim_markdown_frontmatter = 1
+
+" Format strike-through text (wrapped in `~~`).
+let g:vim_markdown_strikethrough = 1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
